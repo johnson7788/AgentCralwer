@@ -167,7 +167,7 @@ class AnalyzerAgent(LlmAgent):
             instruction=self._dynamic_instruction,
             before_model_callback=self._before_model_cb,
             after_model_callback=self._after_model_cb,
-            before_agent_callback=self._before_agent_cb,
+            # before_agent_callback=self._before_agent_cb,
             **kwargs
         )
 
@@ -190,7 +190,6 @@ class AnalyzerAgent(LlmAgent):
         :return:
         """
         # 返回 None，继续调用 LLM
-        callback_context.session.events = []
         return None
     def _before_model_cb(self, callback_context: CallbackContext, llm_request) -> Optional[Any]:
         logger.info(f"[AnalyzerAgent] start. question={callback_context.state.get('question')}")
