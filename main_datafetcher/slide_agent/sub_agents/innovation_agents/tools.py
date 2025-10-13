@@ -61,9 +61,9 @@ def load_mcp_tools(server_url: str) -> Dict[str, FunctionTool]:
         tool_infos += f"{name}: {desc}\n"
 
         def make_tool_func(tool_name):
-            def _func(**kwargs):
-                result = call_mcp_tool_sync(server_url, tool_name, kwargs)
-                print(f"调用 MCP 工具 {tool_name}，的结果是: {result}")
+            async def _func(**kwargs):
+                result = await call_mcp_tool_async(server_url, tool_name, kwargs)
+                print(f"调用 MCP 工具 {tool_name} 的结果是: {result}")
                 return result
             return _func
 
