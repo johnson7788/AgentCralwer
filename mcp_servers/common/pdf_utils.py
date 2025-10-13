@@ -4,7 +4,7 @@
 # @File  : pdf_utils.py.py
 # @Author: johnson
 # @Contact : github: johnson7788
-# @Desc  : 下载pdf的不同的方式
+# @Desc  : 下载pdf文件的不同的方式
 
 import os
 import re
