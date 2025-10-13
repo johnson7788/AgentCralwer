@@ -71,6 +71,7 @@ def get_cache_key(query: str) -> str:
 
 # ========= 根据问题做一个轻量级的启发式排序（后期改成Embedding排序） =========
 def rank_tools_for_query(q: str, exclude: Optional[List[str]] = None) -> List[str]:
+    """需要改造"""
     ql = (q or "").lower()
     exclude = set(exclude or [])
     scores = []
