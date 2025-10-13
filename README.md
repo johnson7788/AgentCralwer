@@ -50,13 +50,15 @@
     根据您的配置，首先启动 `mcp_servers` 目录中定义的微抓取解决方案服务。
     ```bash
     # 示例：启动一个PDF处理服务
-    python mcp_servers/mcp_href_pdf.py
+    cd mcp_servers
+    python mcp_href_pdf.py
     ```
 
 2.  **启动主 Agent 服务**
     `main_datafetcher/main_api.py` 是项目的主入口。运行以下命令启动 Agent API 服务：
     ```bash
-    python main_datafetcher/main_api.py --host 127.0.0.1 --port 10086
+    cd main_datafetcher
+    python main_api.py
     ```
     -   `--host`: 服务器绑定的主机名，可指定为 `0.0.0.0` 以允许外部访问。
     -   `--port`: 服务器监听的端口号。

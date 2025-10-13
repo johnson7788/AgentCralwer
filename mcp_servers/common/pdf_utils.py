@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Date  : 2025/10/13 10:41
-# @File  : pdf_utils.py.py
+# @File  : pdf_utils.py
 # @Author: johnson
 # @Contact : github: johnson7788
 # @Desc  : 下载pdf文件的不同的方式
