@@ -85,19 +85,37 @@ async def call_mcp_tool_async(server_url, tool_name: str, arguments: Dict[str, A
         return result
 
 
-def call_mcp_tool_sync(server_url, tool_name: str, arguments: Dict[str, Any]) -> str:
-    loop = None
+# def call_mcp_tool_sync(server_url, tool_name: str, arguments: Dict[str, Any]) -> str:
+#     loop = None
+#     try:
+#         loop = asyncio.get_running_loop()
+#     except RuntimeError:
+#         pass
+#
+#     if loop and loop.is_running():
+#         # 已经有 loop，直接 run_until_complete
+#         return loop.run_until_complete(call_mcp_tool_async(server_url, tool_name, arguments))
+#     else:
+#         # 没有 loop，用 asyncio.run
+#         return asyncio.run(call_mcp_tool_async(server_url, tool_name, arguments))
+
+def call_mcp_tool_sync(server_url, tool_name: str, arguments: Dict[str, Any]) -> Any:
     try:
         loop = asyncio.get_running_loop()
     except RuntimeError:
-        pass
+        loop = None
 
     if loop and loop.is_running():
-        # 已经有 loop，直接 run_until_complete
-        return loop.run_until_complete(call_mcp_tool_async(server_url, tool_name, arguments))
+        # 如果当前在运行的事件循环中，在线程中执行异步任务
+        future = asyncio.run_coroutine_threadsafe(
+            call_mcp_tool_async(server_url, tool_name, arguments),
+            loop
+        )
+        return future.result()
     else:
-        # 没有 loop，用 asyncio.run
+        # 如果没有正在运行的 loop，直接新建一个
         return asyncio.run(call_mcp_tool_async(server_url, tool_name, arguments))
+
 
 async def main():
     # Example usage: Load config and list tools from all servers
