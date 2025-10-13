@@ -35,7 +35,7 @@ async def download_pdf_via_href_links(url: str, project_name: str, ctx: Context)
     :return: 下载结果
     """
     save_dir = os.path.join("./downloaded_pdfs", project_name)
-    meta_in = ctx.request_meta or {}
+    # meta_in = ctx.request_meta or {}
     run_config = get_run_configs("href_pdf")
     status = asyncio.run(download_with_crawler(url, save_dir, run_config))
     result = f"✅ [HREF下载成功]: {url}" if status else f"❌ [HREF下载失败]: {url}"
@@ -43,7 +43,7 @@ async def download_pdf_via_href_links(url: str, project_name: str, ctx: Context)
     return CallToolResult(
         content=[{"type": "text", "text": result}],
         meta={
-            "user_id": meta_in.get("user_id", "unknown"),
+            # "user_id": meta_in.get("user_id", "unknown"),
             "server_timestamp": datetime.datetime.utcnow().isoformat() + "Z",
         },
     )
@@ -69,7 +69,7 @@ async def download_pdf_via_mime_type(url: str, project_name: str, ctx: Context) 
     :return: 下载结果
     """
     save_dir = os.path.join("./downloaded_pdfs", project_name)
-    meta_in = ctx.request_meta or {}
+    # meta_in = ctx.request_meta or {}
     run_config = get_run_configs("application_pdf")
     status = asyncio.run(download_with_crawler(url, save_dir, run_config))
     result = f"✅ [MIME下载成功]: {url}" if status else f"❌ [MIME下载失败]: {url}"
@@ -77,7 +77,7 @@ async def download_pdf_via_mime_type(url: str, project_name: str, ctx: Context) 
     return CallToolResult(
         content=[{"type": "text", "text": result}],
         meta={
-            "user_id": meta_in.get("user_id", "unknown"),
+            # "user_id": meta_in.get("user_id", "unknown"),
             "server_timestamp": datetime.datetime.utcnow().isoformat() + "Z",
         },
     )
@@ -103,14 +103,14 @@ async def download_pdf_via_html_parse(url: str, project_name: str, ctx: Context)
     :return: 下载结果
     """
     save_dir = os.path.join("./downloaded_pdfs", project_name)
-    meta_in = ctx.request_meta or {}
+    # meta_in = ctx.request_meta or {}
     status = asyncio.run(fetch_pdfs_from_page(url, save_dir))
     result = f"✅ [HTML解析下载成功]: {url}" if status else f"❌ [HTML解析下载失败]: {url}"
 
     return CallToolResult(
         content=[{"type": "text", "text": result}],
         meta={
-            "user_id": meta_in.get("user_id", "unknown"),
+            # "user_id": meta_in.get("user_id", "unknown"),
             "server_timestamp": datetime.datetime.utcnow().isoformat() + "Z",
         },
     )
