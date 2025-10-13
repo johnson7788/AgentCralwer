@@ -15,6 +15,16 @@ from .mcp_client import get_mcp_tools, call_mcp_tool_sync
 
 dotenv.load_dotenv()
 
+class MYFunctionTool(FunctionTool):
+    """
+    继承 FunctionTool，添加自定义功能。
+    """
+    def __init__(self, func: Any, name: str, description: str, parameters: Dict[str, Any]):
+        """Extract metadata from a callable object."""
+        super().BaseTool.__init__(name=name, description=description)
+        self.func = func
+        self._ignore_params = ['tool_context', 'input_stream']
+
 # ========== 动态加载 MCP 工具 ==========
 
 def load_mcp_tools(server_url: str) -> Dict[str, FunctionTool]:
@@ -48,7 +58,12 @@ def load_mcp_tools(server_url: str) -> Dict[str, FunctionTool]:
             return _func
 
         func = make_tool_func(name)
-        wrapped = FunctionTool(func=func)
+        wrapped = MYFunctionTool(
+            func=func,
+            name=name,
+            description=desc,
+            parameters=params
+        )
         tool_dict[name] = wrapped
 
     print(f"✅ Loaded {len(tool_dict)} tools dynamically from {server_url}")
