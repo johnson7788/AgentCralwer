@@ -60,3 +60,4 @@ example/conversations.db
 example/conversations.db-shm
 example/conversations.db-wal
 example/tool_cache.db
+mcp_servers/downloaded_pdfs/
