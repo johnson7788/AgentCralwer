@@ -19,7 +19,7 @@ mcp = FastMCP("PDFDownloader")
 # 1️⃣ HREF 链接抓取下载：查找页面中所有以 .pdf 结尾的 href 并下载
 # ======================================================
 @mcp.tool()
-async def download_pdf_via_href_links(url: str, project_name: str, ctx: Context) -> CallToolResult:
+async def download_pdf_via_href_links(url: str, project_name: str) -> CallToolResult:
     """
     从网页中提取所有直接以 `.pdf` 结尾的超链接 (href)，并通过浏览器自动触发下载。
 
@@ -31,7 +31,6 @@ async def download_pdf_via_href_links(url: str, project_name: str, ctx: Context)
 
     :param url: 目标网页 URL
     :param project_name: 下载项目名称 (用于保存目录)
-    :param ctx: MCP 上下文对象
     :return: 下载结果
     """
     save_dir = os.path.join("./downloaded_pdfs", project_name)
@@ -53,7 +52,7 @@ async def download_pdf_via_href_links(url: str, project_name: str, ctx: Context)
 # 2️⃣ MIME类型识别下载：检测 <a type="application/pdf"> 标签
 # ======================================================
 @mcp.tool()
-async def download_pdf_via_mime_type(url: str, project_name: str, ctx: Context) -> CallToolResult:
+async def download_pdf_via_mime_type(url: str, project_name: str) -> CallToolResult:
     """
     通过识别页面中声明 MIME 类型为 `application/pdf` 的链接下载 PDF。
 
@@ -65,7 +64,6 @@ async def download_pdf_via_mime_type(url: str, project_name: str, ctx: Context) 
 
     :param url: 目标网页 URL
     :param project_name: 下载项目名称
-    :param ctx: MCP 上下文对象
     :return: 下载结果
     """
     save_dir = os.path.join("./downloaded_pdfs", project_name)
@@ -87,7 +85,7 @@ async def download_pdf_via_mime_type(url: str, project_name: str, ctx: Context) 
 # 3️⃣ 页面正则提取下载：解析 HTML 并用 aiohttp 下载 PDF
 # ======================================================
 @mcp.tool()
-async def download_pdf_via_html_parse(url: str, project_name: str, ctx: Context) -> CallToolResult:
+async def download_pdf_via_html_parse(url: str, project_name: str) -> CallToolResult:
     """
     直接抓取网页 HTML 内容，通过正则表达式提取所有 PDF 链接并下载。
 
@@ -99,7 +97,6 @@ async def download_pdf_via_html_parse(url: str, project_name: str, ctx: Context)
 
     :param url: 目标网页 URL
     :param project_name: 下载项目名称
-    :param ctx: MCP 上下文对象
     :return: 下载结果
     """
     save_dir = os.path.join("./downloaded_pdfs", project_name)
