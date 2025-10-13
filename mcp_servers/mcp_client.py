@@ -137,15 +137,7 @@ async def main():
             print(f"    标签: {', '.join(tool.get('tags'))}")
         print()
 
-    result = await call_mcp_tool_async(url, "get_lng_price",  {'region': '浙江', 'start_date': '2025-04-17'})
-    print(result)
-    result = call_mcp_tool_sync(url, "get_lng_price",  {'region': '浙江', 'start_date': '2025-04-17'})
-    print(result)
-    result = await call_mcp_tool_async(url, "get_current_time",  {})
-    print(result)
-    result = call_mcp_tool_sync(url, "get_current_time",  {})
-    print(result)
-    result = call_mcp_tool_sync(url, "unknow_tools",  {})
+    result = await call_mcp_tool_async(url, "download_pdf_via_href_links",  {'url': 'https://ir.ehang.com/financial-information/quarterly-results', 'project_name': '亿航智能'})
     print(result)
 if __name__ == '__main__':
     asyncio.run(main())

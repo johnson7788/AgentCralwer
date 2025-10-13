@@ -1,92 +1,96 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Date  : 2025/6/20 10:02
-# @File  : tools.py.py
+# @File  : tools.py
 # @Author: johnson
 # @Contact : github: johnson7788
-# @Desc  : 搜索图片，用于PPT的配图
+# @Desc  : 动态加载 MCP Server 工具（取代写死定义）
 
-import re
-import os
-import time
-import httpx
-from datetime import datetime
-import random
-import dotenv
-from google.adk.tools import FunctionTool
-import hashlib
-from google.adk.tools import ToolContext
-import requests
+import asyncio
 import json
-from typing import List, Dict, Any
+import dotenv
+from typing import Dict, Any
+from google.adk.tools import FunctionTool
+from innovation_agents.mcp_client import get_mcp_tools, call_mcp_tool_sync
+
 dotenv.load_dotenv()
 
-# ========= 定义基础工具（示例，与 OpenAI Agent 示例保持一致） =========
-def calc_expression(expr: str) -> dict:
+# ========== 动态加载 MCP 工具 ==========
+
+def load_mcp_tools(server_url: str) -> Dict[str, FunctionTool]:
     """
-    计算基础算术表达式（支持 + - * / 和括号）。
-    Args:
-        expr: 算式，如 "12*(3+4)/2"
-    Returns:
-        dict: {'status':'success','result':<number>} 或 {'status':'error','error_message':<msg>}
+    动态从 MCP server 拉取所有工具，并包装为 FunctionTool。
+    """
+    async def _load():
+        tools = await get_mcp_tools(server_url)
+        return tools
+
+    try:
+        tools_meta = asyncio.run(_load())
+    except Exception as e:
+        print(f"❌ Failed to load tools from MCP server {server_url}: {e}")
+        return {}
+
+    tool_dict = {}
+
+    for tool in tools_meta:
+        name = tool.get("name")
+        desc = tool.get("description", "No description provided")
+        params = tool.get("parameters", {})
+
+        def make_tool_func(tool_name):
+            def _func(**kwargs):
+                """动态代理 MCP 工具调用"""
+                result = call_mcp_tool_sync(server_url, tool_name, kwargs)
+                return result
+            return _func
+
+        func = make_tool_func(name)
+        wrapped = FunctionTool(
+            func=func,
+            name=name,
+            description=desc,
+            parameters=params
+        )
+        tool_dict[name] = wrapped
+
+    print(f"✅ Loaded {len(tool_dict)} tools dynamically from {server_url}")
+    return tool_dict
+
+
+# ========== 入口配置 ==========
+
+def get_all_tools() -> Dict[str, FunctionTool]:
+    """
+    从 ./mcp_config.json 中加载配置，然后动态拉取工具。
     """
     try:
-        val = eval(expr, {"__builtins__": {}}, {})
-        return {"status": "success", "result": val}
-    except Exception as e:
-        return {"status": "error", "error_message": str(e)}
+        with open("./mcp_config.json", "r", encoding="utf-8") as f:
+            config = json.load(f)
+    except FileNotFoundError:
+        print("❌ Cannot find mcp_config.json. Please make sure it exists.")
+        return {}
 
-def unit_convert(value: float, from_unit: str, to_unit: str) -> dict:
-    """
-    简单单位换算（当前支持 'km' <-> 'miles'）。
-    Args:
-        value: 数值
-        from_unit: 'km' 或 'miles'
-        to_unit: 'km' 或 'miles'
-    Returns:
-        dict: {'status':'success','result':<number>} 或 {'status':'error','error_message':<msg>}
-    """
-    try:
-        if from_unit == to_unit:
-            res = value
-        elif from_unit == "km" and to_unit == "miles":
-            res = value * 0.621371
-        elif from_unit == "miles" and to_unit == "km":
-            res = value / 0.621371
-        else:
-            return {"status": "error", "error_message": "unsupported units"}
-        return {"status": "success", "result": res}
-    except Exception as e:
-        return {"status": "error", "error_message": str(e)}
+    mcp_servers = config.get("mcpServers", {})
+    all_tools = {}
 
-def lookup_fact(topic: str) -> dict:
-    """
-    伪“知识库查询”（演示用），实际可替换为外部 HTTP/DB 检索。
-    Args:
-        topic: 主题
-    Returns:
-        dict: {'status':'success','result':<text>} 或 {'status':'error','error_message':<msg>}
-    """
-    FAKE_DB = {
-        "python": "Python 是一种解释型、通用型编程语言。",
-        "openai": "OpenAI 提供了 Responses API 与 Agents SDK 等开发者工具。"
-    }
-    text = FAKE_DB.get(topic.lower())
-    if text:
-        return {"status": "success", "result": text}
-    return {"status": "error", "error_message": "not found"}
+    for name, info in mcp_servers.items():
+        if info.get("disabled"):
+            continue
+        url = info.get("url")
+        if not url:
+            continue
+        tools = load_mcp_tools(url)
+        all_tools.update(tools)
 
-# 包装为 ADK FunctionTool（供 LLM 直接调用）  —— ADK 建议这样定义工具函数。:contentReference[oaicite:3]{index=3}
-TOOL_CALC = FunctionTool(func=calc_expression)
-TOOL_UNIT = FunctionTool(func=unit_convert)
-TOOL_FACT = FunctionTool(func=lookup_fact)
+    return all_tools
 
-# 工具注册表
-ALL_TOOLS = {
-    "calc_expression": TOOL_CALC,
-    "unit_convert": TOOL_UNIT,
-    "lookup_fact": TOOL_FACT,
-}
 
-if __name__ == '__main__':
-    pass
+# ========== 导出全局注册表 ==========
+
+ALL_TOOLS = get_all_tools()
+
+if __name__ == "__main__":
+    # 仅测试输出
+    for k in ALL_TOOLS:
+        print(f"Tool: {k}")
