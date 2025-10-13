@@ -1,3 +1,4 @@
 playwright_stealth
 crawl4ai
 openai-agents
+nest_asyncio
