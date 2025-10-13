@@ -35,6 +35,10 @@
     ```bash
     # 安装主依赖
     pip install -r requirements.txt
+    # 安装爬虫模块的依赖的浏览器组件等
+    crawl4ai-setup
+    #验证
+    crawl4ai-doctor
 
     # 安装数据获取模块的依赖
     pip install -r main_datafetcher/requirements.txt

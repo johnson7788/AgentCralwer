@@ -85,19 +85,37 @@ async def call_mcp_tool_async(server_url, tool_name: str, arguments: Dict[str, A
         return result
 
 
-def call_mcp_tool_sync(server_url, tool_name: str, arguments: Dict[str, Any]) -> str:
-    loop = None
+# def call_mcp_tool_sync(server_url, tool_name: str, arguments: Dict[str, Any]) -> str:
+#     loop = None
+#     try:
+#         loop = asyncio.get_running_loop()
+#     except RuntimeError:
+#         pass
+#
+#     if loop and loop.is_running():
+#         # 已经有 loop，直接 run_until_complete
+#         return loop.run_until_complete(call_mcp_tool_async(server_url, tool_name, arguments))
+#     else:
+#         # 没有 loop，用 asyncio.run
+#         return asyncio.run(call_mcp_tool_async(server_url, tool_name, arguments))
+
+def call_mcp_tool_sync(server_url, tool_name: str, arguments: Dict[str, Any]) -> Any:
     try:
         loop = asyncio.get_running_loop()
     except RuntimeError:
-        pass
+        loop = None
 
     if loop and loop.is_running():
-        # 已经有 loop，直接 run_until_complete
-        return loop.run_until_complete(call_mcp_tool_async(server_url, tool_name, arguments))
+        # 如果当前在运行的事件循环中，在线程中执行异步任务
+        future = asyncio.run_coroutine_threadsafe(
+            call_mcp_tool_async(server_url, tool_name, arguments),
+            loop
+        )
+        return future.result()
     else:
-        # 没有 loop，用 asyncio.run
+        # 如果没有正在运行的 loop，直接新建一个
         return asyncio.run(call_mcp_tool_async(server_url, tool_name, arguments))
+
 
 async def main():
     # Example usage: Load config and list tools from all servers
@@ -137,7 +155,8 @@ async def main():
             print(f"    标签: {', '.join(tool.get('tags'))}")
         print()
 
-    result = await call_mcp_tool_async(url, "download_pdf_via_mime_type",  {'url': 'https://ir.ehang.com/financial-information/quarterly-results', 'project_name': '亿航智能'})
+    result = await call_mcp_tool_async(url, "download_pdf_via_href_links",  {'url': 'https://crland-umb.azurewebsites.net/zh-cn/investors/financial-results-and-presentations/', 'project_name': '华润置地'})
+    # result = await call_mcp_tool_async(url, "download_pdf_via_mime_type",  {'url': 'https://ir.ehang.com/financial-information/quarterly-results', 'project_name': '亿航智能'})
     print(result)
 if __name__ == '__main__':
     asyncio.run(main())
