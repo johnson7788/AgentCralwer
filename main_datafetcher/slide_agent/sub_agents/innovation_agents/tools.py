@@ -48,12 +48,7 @@ def load_mcp_tools(server_url: str) -> Dict[str, FunctionTool]:
             return _func
 
         func = make_tool_func(name)
-        wrapped = FunctionTool(
-            func=func,
-            name=name,
-            description=desc,
-            parameters=params
-        )
+        wrapped = FunctionTool(func=func)
         tool_dict[name] = wrapped
 
     print(f"✅ Loaded {len(tool_dict)} tools dynamically from {server_url}")
