@@ -79,8 +79,7 @@ flowchart TD
     crawl4ai-setup
     #验证
     crawl4ai-doctor
-
-    # 安装数据获取模块的依赖
+    # 安装Agent的依赖
     pip install -r main_datafetcher/requirements.txt
     ```
     *注意：建议使用虚拟环境（如 venv 或 conda）来管理项目依赖。*
