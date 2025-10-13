@@ -18,6 +18,8 @@ from google.adk.tools.base_toolset import BaseToolset
 from ...config import CONTENT_WRITER_AGENT_CONFIG, CHECKER_AGENT_CONFIG
 from ...create_model import create_model
 from .tools import ALL_TOOLS
+from .prompt import AnalyzerAgent_PROMPT, ExecutorAgent_PROMPT
+
 
 logger = logging.getLogger(__name__)
 
@@ -170,21 +172,19 @@ class AnalyzerAgent(LlmAgent):
 
     def _dynamic_instruction(self, ctx: InvocationContext) -> str:
         question = ctx.state.get("question", "")
-        tried = ctx.state.get("tried_tools", [])
+        tried_list = ctx.state.get("tried_tools", [])
+        tried = ", ".join(tried_list) if tried_list else "无"
         try_num = int(ctx.state.get("try_tool_number", 2) or 2)
-        tool_desc = [
+        tool_desc = "\n".join([
             "- calc_expression: 计算含 + - * / 与括号的表达式",
             "- unit_convert: 在 km 与 miles 之间换算",
             "- lookup_fact: 简单知识库查询"
-        ]
-        return (
-            "你是工具调度分析器。请阅读用户问题与已失败的工具，"
-            f"从下面的工具中选择**最有可能解决问题**的至多 {try_num} 个工具名，按优先级从高到低返回。\n"
-            "工具清单：\n" + "\n".join(tool_desc) + "\n\n"
-            f"用户问题：{question}\n"
-            f"已失败的工具：{', '.join(tried) if tried else '无'}\n\n"
-            "请仅输出 JSON（不要输出其它内容）：\n"
-            '{"candidates": ["<tool_name_1>", "<tool_name_2>"]}'
+        ])
+        return AnalyzerAgent_PROMPT.format(
+            try_num=try_num,
+            tool_desc=tool_desc,
+            question=question,
+            tried=tried
         )
 
     def _before_agent_cb(self, callback_context: CallbackContext) -> None:
@@ -236,14 +236,7 @@ class ExecutorAgent(LlmAgent):
 
     def _instruction(self, ctx: InvocationContext) -> str:
         question = ctx.state.get("question", "")
-        return (
-            "你是问题求解助手。你必须尽可能调用可用的工具；"
-            "当工具返回 {'status':'success', ...} 时即可视为成功。"
-            "若工具返回 {'status':'error', ...}，你应换用其他工具继续尝试（如果还有）。\n\n"
-            "完成后，请用严格格式回复（不要多余文字）：\n"
-            "SOLVED:true|false JSON:{\"tool\":\"<工具名或none>\",\"answer\":\"<最终答案或错误原因>\"}\n\n"
-            f"用户问题：{question}"
-        )
+        return ExecutorAgent_PROMPT.format(question=question)
 
     def _after_model_cb(self, callback_context: CallbackContext, llm_response) -> Optional[Any]:
         parts = llm_response.content.parts or []
