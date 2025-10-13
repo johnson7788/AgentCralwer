@@ -11,7 +11,8 @@ import json
 import dotenv
 from typing import Dict, Any
 from google.adk.tools import FunctionTool
-from .mcp_client import get_mcp_tools, call_mcp_tool_sync
+from google.genai import types
+from .mcp_client import get_mcp_tools, call_mcp_tool_sync, call_mcp_tool_async
 
 dotenv.load_dotenv()
 
@@ -19,11 +20,20 @@ class MYFunctionTool(FunctionTool):
     """
     继承 FunctionTool，添加自定义功能。
     """
-    def __init__(self, func: Any, name: str, description: str, parameters: Dict[str, Any]):
-        """Extract metadata from a callable object."""
-        super().BaseTool.__init__(name=name, description=description)
+    def __init__(self, func, name, description, parameters):
+        super().__init__(func)
+        self.name = name
+        self.description = description
+        self.parameters = parameters
         self.func = func
-        self._ignore_params = ['tool_context', 'input_stream']
+
+    def _get_declaration(self):
+        """基于自定义参数生成 FunctionDeclaration"""
+        return types.FunctionDeclaration(
+            name=self.name,
+            description=self.description,
+            parameters=self.parameters
+        )
 
 # ========== 动态加载 MCP 工具 ==========
 
@@ -51,9 +61,9 @@ def load_mcp_tools(server_url: str) -> Dict[str, FunctionTool]:
         tool_infos += f"{name}: {desc}\n"
 
         def make_tool_func(tool_name):
-            def _func(**kwargs):
-                """动态代理 MCP 工具调用"""
-                result = call_mcp_tool_sync(server_url, tool_name, kwargs)
+            async def _func(**kwargs):
+                result = await call_mcp_tool_async(server_url, tool_name, kwargs)
+                print(f"调用 MCP 工具 {tool_name}，的结果是: {result}")
                 return result
             return _func
 

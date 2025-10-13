@@ -22,7 +22,7 @@ mcp = FastMCP("PDFDownloader")
 async def download_pdf_via_href_links(url: str, project_name: str) -> CallToolResult:
     """
     从网页中提取所有直接以 `.pdf` 结尾的超链接 (href)，并通过浏览器自动触发下载。
-
+    默认使用这个即可下做所有pdf文件了，优先使用。
     📘 特点:
     - 使用 crawl4ai 的异步浏览器；
     - 扫描页面中 `a[href$='.pdf']` 等链接；
