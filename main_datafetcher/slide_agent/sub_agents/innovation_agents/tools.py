@@ -32,11 +32,13 @@ def load_mcp_tools(server_url: str) -> Dict[str, FunctionTool]:
         return {}
 
     tool_dict = {}
+    tool_infos = ""
 
     for tool in tools_meta:
         name = tool.get("name")
         desc = tool.get("description", "No description provided")
         params = tool.get("parameters", {})
+        tool_infos += f"{name}: {desc}\n"
 
         def make_tool_func(tool_name):
             def _func(**kwargs):
@@ -55,7 +57,7 @@ def load_mcp_tools(server_url: str) -> Dict[str, FunctionTool]:
         tool_dict[name] = wrapped
 
     print(f"✅ Loaded {len(tool_dict)} tools dynamically from {server_url}")
-    return tool_dict
+    return tool_dict, tool_infos
 
 
 # ========== 入口配置 ==========
@@ -73,22 +75,24 @@ def get_all_tools() -> Dict[str, FunctionTool]:
 
     mcp_servers = config.get("mcpServers", {})
     all_tools = {}
-
+    tool_info_content = ""
     for name, info in mcp_servers.items():
         if info.get("disabled"):
             continue
         url = info.get("url")
         if not url:
             continue
-        tools = load_mcp_tools(url)
+        tools, tool_infos = load_mcp_tools(url)
+        tool_info_content += tool_infos
         all_tools.update(tools)
 
-    return all_tools
+
+    return all_tools, tool_info_content
 
 
 # ========== 导出全局注册表 ==========
-
-ALL_TOOLS = get_all_tools()
+# 工具和工具的描述信息
+ALL_TOOLS, TOOLS_INFO = get_all_tools()
 
 if __name__ == "__main__":
     # 仅测试输出

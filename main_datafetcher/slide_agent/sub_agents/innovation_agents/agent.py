@@ -17,7 +17,7 @@ from google.adk.agents.callback_context import CallbackContext
 from google.adk.tools.base_toolset import BaseToolset
 from ...config import CONTENT_WRITER_AGENT_CONFIG, CHECKER_AGENT_CONFIG
 from ...create_model import create_model
-from .tools import ALL_TOOLS
+from .tools import ALL_TOOLS, TOOLS_INFO
 from .prompt import AnalyzerAgent_PROMPT, ExecutorAgent_PROMPT
 
 
@@ -176,14 +176,9 @@ class AnalyzerAgent(LlmAgent):
         tried_list = ctx.state.get("tried_tools", [])
         tried = ", ".join(tried_list) if tried_list else "无"
         try_num = int(ctx.state.get("try_tool_number", 2) or 2)
-        tool_desc = "\n".join([
-            "- calc_expression: 计算含 + - * / 与括号的表达式",
-            "- unit_convert: 在 km 与 miles 之间换算",
-            "- lookup_fact: 简单知识库查询"
-        ])
         return AnalyzerAgent_PROMPT.format(
             try_num=try_num,
-            tool_desc=tool_desc,
+            tool_desc=TOOLS_INFO,
             question=question,
             tried=tried
         )
