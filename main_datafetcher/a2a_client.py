@@ -35,7 +35,6 @@ async def httpx_client():
 
 if __name__ == '__main__':
     # 示例输入
-    # prompt = """请计算 (12+8)*3/2"""
     request_id = "123456"
     prompt = """爬取这个网站中所有pdf文件，保存到华润置地目录下中： https://crland-umb.azurewebsites.net/zh-cn/investors/financial-results-and-presentations/"""
     metadata = {"download_dir": "downloaded_pdfs"}
