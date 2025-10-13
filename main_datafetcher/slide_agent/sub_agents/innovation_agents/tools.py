@@ -11,7 +11,7 @@ import json
 import dotenv
 from typing import Dict, Any
 from google.adk.tools import FunctionTool
-from innovation_agents.mcp_client import get_mcp_tools, call_mcp_tool_sync
+from .mcp_client import get_mcp_tools, call_mcp_tool_sync
 
 dotenv.load_dotenv()
 
