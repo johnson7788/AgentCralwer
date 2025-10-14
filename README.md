@@ -66,7 +66,7 @@ flowchart TD
 
 1.  **克隆项目**
     ```bash
-    git clone xxx
+    git clone https://github.com/johnson7788/spiderme
     cd spiderme
     ```
 
@@ -93,7 +93,7 @@ flowchart TD
 1.  **启动 MCP 解决方案服务器**
     根据您的配置，首先启动 `mcp_servers` 目录中定义的微抓取解决方案服务。
     ```bash
-    # 示例：启动一个PDF处理服务
+    # 示例：启动一个PDF处理服务，这里只是用PDF抓取的MCP，可以添加更多MCP，但是必须先启动MCP服务，因为Agent启东时依赖这个MCP服务
     cd mcp_servers
     python mcp_href_pdf.py
     ```
