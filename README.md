@@ -409,4 +409,4 @@ event.content没有结果，跳过, Agent是: ControllerAgent, event是: content
 ```
 
 ## 数据截图
-![download_screeshot.png](docs%2Fdownload_screeshot.png)![img.png](img.png)
+![download_screeshot.png](docs%2Fdownload_screeshot.png)
