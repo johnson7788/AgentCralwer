@@ -15,6 +15,7 @@ from common.pdf_utils import get_run_configs, download_with_crawler, fetch_pdfs_
 
 mcp = FastMCP("PDFDownloader")
 
+
 # ======================================================
 # 1️⃣ HREF 链接抓取下载：查找页面中所有以 .pdf 结尾的 href 并下载
 # ======================================================
