@@ -71,7 +71,7 @@ def get_cache_key(query: str) -> str:
 
 # ========= 根据问题做一个轻量级的启发式排序（后期改成Embedding排序） =========
 def rank_tools_for_query(q: str, exclude: Optional[List[str]] = None) -> List[str]:
-    """需要改造"""
+    """如果分析Agent没有分析出要使用的工具时或者出现异常时，改成这个备用的启发式排序工具"""
     ql = (q or "").lower()
     exclude = set(exclude or [])
     scores = []
@@ -89,7 +89,7 @@ def rank_tools_for_query(q: str, exclude: Optional[List[str]] = None) -> List[st
     ordered = [n for _, _, n in sorted(scores, key=lambda x: (x[0], x[1]), reverse=True)]
     return [n for n in ordered if n not in exclude]
 
-# ========= 动态 Toolset：本轮只把“候选工具”暴露给 LLM =========
+# ========= 动态 Toolset：只把“候选工具”暴露给 LLM =========
 class CandidateToolset(BaseToolset):
     def __init__(self, default_top_k: int = 2):
         self.default_top_k = default_top_k
