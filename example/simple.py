@@ -1,5 +1,5 @@
 import asyncio
-from crawl4ai import *
+from crawl4ai import AsyncWebCrawler
 
 async def main():
     async with AsyncWebCrawler() as crawler:
