@@ -7,6 +7,7 @@
 # @Desc  : 网页内容保存成markdown
 
 import asyncio
+from crawl4ai.async_configs import BrowserConfig, CrawlerRunConfig
 from crawl4ai import AsyncWebCrawler
 
 async def save_markdown(url, save_path):
@@ -14,7 +15,8 @@ async def save_markdown(url, save_path):
     url: "https://www.nbcnews.com/business"
     """
     content = ""
-    async with AsyncWebCrawler() as crawler:
+    config = BrowserConfig(headless=False)
+    async with AsyncWebCrawler(config=config) as crawler:
         result = await crawler.arun(
             url=url,
         )

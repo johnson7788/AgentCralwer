@@ -7,11 +7,12 @@
 # @Desc  : 三种不同策略的 PDF 下载工具 (基于 FastMCP)
 
 import datetime
-import os.path
+import os
 import asyncio
 from fastmcp import FastMCP, Context
 from mcp.types import CallToolResult
 from common.pdf_utils import get_run_configs, download_with_crawler, fetch_pdfs_from_page
+from common.markdown_utils import save_markdown
 
 mcp = FastMCP("PDFDownloader")
 
@@ -109,6 +110,41 @@ async def download_pdf_via_html_parse(url: str, project_name: str) -> CallToolRe
         content=[{"type": "text", "text": result}],
         meta={
             # "user_id": meta_in.get("user_id", "unknown"),
+            "server_timestamp": datetime.datetime.utcnow().isoformat() + "Z",
+        },
+    )
+
+
+# ======================================================
+# 4️⃣ 网页内容保存为 Markdown
+# ======================================================
+@mcp.tool()
+async def save_webpage_as_markdown(url: str, project_name: str) -> CallToolResult:
+    """
+    抓取指定 URL 的网页内容，并将其保存为 Markdown 格式的文件。
+
+    📘 特点:
+    - 使用 crawl4ai 提取网页主要内容并转换为 Markdown；
+    - 保存到 `downloaded_markdowns/{project_name}` 目录下；
+    - 文件名基于当前时间戳生成。
+
+    :param url: 目标网页 URL
+    :param project_name: 项目名称 (用于保存目录)
+    :return: 保存结果
+    """
+    save_dir = os.path.join("./downloaded_markdowns", project_name)
+    os.makedirs(save_dir, exist_ok=True)
+
+    # Generate a unique filename using a timestamp
+    filename = f"{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+    save_path = os.path.join(save_dir, filename)
+
+    status = await save_markdown(url, save_path)
+    result = f"✅ [Markdown 保存成功]: {save_path}" if status else f"❌ [Markdown 保存失败]: {url}"
+
+    return CallToolResult(
+        content=[{"type": "text", "text": result}],
+        meta={
             "server_timestamp": datetime.datetime.utcnow().isoformat() + "Z",
         },
     )

@@ -155,7 +155,8 @@ async def main():
             print(f"    标签: {', '.join(tool.get('tags'))}")
         print()
 
-    result = await call_mcp_tool_async(url, "download_pdf_via_href_links",  {'url': 'https://crland-umb.azurewebsites.net/zh-cn/investors/financial-results-and-presentations/', 'project_name': '华润置地'})
+    # result = await call_mcp_tool_async(url, "download_pdf_via_href_links",  {'url': 'https://crland-umb.azurewebsites.net/zh-cn/investors/financial-results-and-presentations/', 'project_name': '华润置地'})
+    result = await call_mcp_tool_async(url, "save_webpage_as_markdown",  {'url': 'https://crland-umb.azurewebsites.net/zh-cn/investors/financial-results-and-presentations/', 'project_name': '网页保存'})
     # result = await call_mcp_tool_async(url, "download_pdf_via_mime_type",  {'url': 'https://ir.ehang.com/financial-information/quarterly-results', 'project_name': '亿航智能'})
     print(result)
 if __name__ == '__main__':
