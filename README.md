@@ -95,7 +95,7 @@ flowchart TD
     ```bash
     # 示例：启动一个PDF处理服务，这里只是用PDF抓取的MCP，可以添加更多MCP，但是必须先启动MCP服务，因为Agent启东时依赖这个MCP服务
     cd mcp_servers
-    python mcp_href_pdf.py
+    python mcp_server.py
     ```
 
 2.  **启动主 Agent 服务**
