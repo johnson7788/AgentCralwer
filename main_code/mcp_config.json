@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "SearchTool": {
+      "url": "http://localhost:8000/sse",
+      "transport": "sse",
+      "description": "pdf下载工具",
+      "disabled": false
+    }
+  }
+}
