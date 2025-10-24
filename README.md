@@ -1,7 +1,7 @@
-# spiderme - 多智能体Web数据抓取框架
+# AgentCralwer - 多智能体Web数据抓取框架
 核心思想： 就是根据问题动态使用不同的工具，如果失败，尝试不同工具，然后记录下成功经验，供下一次解决相似问题使用。
 
-`spiderme` 是一个基于多 Agent 协作的智能化Web数据抓取框架。它利用大型语言模型（LLM）的能力，模拟分析、执行、反思和发现的工作流，以自动化和动态的方式解决复杂的数据提取任务。
+`AgentCralwer` 是一个基于多 Agent 协作的智能化Web数据抓取框架。它利用大型语言模型（LLM）的能力，模拟分析、执行、反思和发现的工作流，以自动化和动态的方式解决复杂的数据提取任务。
 
 ## 核心架构
 
@@ -66,8 +66,8 @@ flowchart TD
 
 1.  **克隆项目**
     ```bash
-    git clone https://github.com/johnson7788/spiderme
-    cd spiderme
+    git clone https://github.com/johnson7788/AgentCralwer
+    cd AgentCralwer
     ```
 
 2.  **安装依赖**
