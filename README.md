@@ -108,7 +108,7 @@ flowchart TD
     -   `--port`: 服务器监听的端口号。
 
 3.  **测试服务**
-    服务启动后，您可以使用 `example/a2a_client.py` 或其他 HTTP 客户端（如 Postman, curl）来与 Agent API 进行交互，测试其功能是否正常。
+    服务启动后，您可以使用 `main_datafetcher/a2a_client.py` 来与 Agent API 进行测试交互，测试其功能是否正常。
 
 ## 路线图 (Roadmap)
 
