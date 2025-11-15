@@ -89,7 +89,7 @@ def textify(node) -> str:
 
 # ------------------------ Crawl4AI 抓取 ------------------------ #
 async def crawl_html(url: str, headless: bool, proxy: str | None, timeout: int,
-                     bypass_cache: bool) -> str:
+                     bypass_cache: bool, wait_for: str) -> str:
     headers = {
         "User-Agent": USER_AGENT,
         "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
@@ -107,7 +107,7 @@ async def crawl_html(url: str, headless: bool, proxy: str | None, timeout: int,
 
     # 等待页面出现表格/列表类元素；部分站点为异步渲染
     run = CrawlerRunConfig(
-        wait_for="css: #matchList .m-tab tr",
+        wait_for=f"css: {wait_for}" if wait_for else None,
         wait_for_timeout=timeout * 1000,
         bypass_cache=bypass_cache,
         # 如需点击“加载更多”，可在此加入 js_code（示例）：
@@ -214,13 +214,13 @@ def map_row_to_match(row: Dict[str, Any], sport: str) -> Match:
                         return v
         return None
 
-    date = first_key(row, ["日期", "日期/时间", "比赛时间", "时间"])
+    date = first_key(row, ['col_1'])
     time_field = None
     if date and re.search(r"\d{1,2}:\d{2}", date):
         m = re.search(r"(\d{1,2}[-/年]\d{1,2}(?:[-/年]\d{1,2})?)\s*(\d{1,2}:\d{2})", date)
         if m:
             date, time_field = m.group(1), m.group(2)
-    league = first_key(row, ["联赛", "赛事", "赛区", "赛事名称"])
+    league = first_key(row, ['col_3'])
     home = first_key(row, ["主队", "主", "主队名称"])
     away = first_key(row, ["客队", "客", "客队名称"])
     handicap = first_key(row, ["让球", "让分", "盘口", "让步"])
@@ -504,13 +504,14 @@ def export_json(matches: List[Match], json_path: Path):
 async def crawl_detail_page(match: Match, headless: bool, proxy: str | None, 
                           timeout: int, bypass_cache: bool) -> Match:
     """抓取单个比赛的详情页"""
+    print(f"抓取详情页，所有的参数是:  {match}")
     if not match.detail_url:
         return match
     
     try:
         print(f"  正在抓取详情页: {match.detail_url}")
         html = await crawl_html(match.detail_url, headless=headless, proxy=proxy, 
-                              timeout=timeout, bypass_cache=bypass_cache)
+                              timeout=timeout, bypass_cache=bypass_cache, wait_for=".m-featureAnalysis")
         
         # 解析详情页
         detail_data = parse_detail_html(html)
@@ -533,9 +534,11 @@ async def crawl_detail_page(match: Match, headless: bool, proxy: str | None,
 
 async def run_once(url: str, sport: str, outdir: Path, headless: bool, proxy: str | None,
                    timeout: int, bypass_cache: bool, fetch_details: bool = False) -> List[Match]:
-    html = await crawl_html(url, headless=headless, proxy=proxy, timeout=timeout, bypass_cache=bypass_cache)
+    html = await crawl_html(url, headless=headless, proxy=proxy, timeout=timeout, bypass_cache=bypass_cache, wait_for="#matchList .m-tab tr")
     save_text(outdir / f"raw_{sport}.html", html)
     matches = parse_matches(html, sport)
+    # 测试时，抓取前3个
+    # matches = matches[:3]
     
     # 如果需要抓取详情页
     if fetch_details and matches:
